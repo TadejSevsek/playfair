@@ -142,5 +142,6 @@ int main(int argc, const char* const argv[]) {
         return -1;
     }
     string key = argv[2];
+    vector<unsigned char> input = readFile(argv[3]);
     return 0;
 }
