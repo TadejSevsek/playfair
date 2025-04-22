@@ -24,6 +24,44 @@ vector<unsigned char> generateTable(const string& key) {
     }
     return table;
 }
+
+
+void findPos(const vector<unsigned char>& table, unsigned char c, int& row, int& col) {
+    for (int i = 0; i < table.size(); i++) {
+        if (table[i] == c) {
+            row = i / 16;
+            col = i % 16;
+            break;
+        }
+    }
+}
+
+pair<unsigned char, unsigned char> encryptPair(const vector<unsigned char>& table, unsigned char a, unsigned char b) {
+    int row1, col1, row2, col2;
+    findPos(table, a, row1, col1);
+    findPos(table, b, row2, col2);
+
+    if (row1 == row2)
+        return { table[row1 * 16 + (col1 + 1) % 16], table[row2 * 16 + (col2 + 1) % 16] };
+    else if (col1 == col2)
+        return { table[((row1 + 1) % 16) * 16 + col1], table[((row2 + 1) % 16) * 16 + col2] };
+    else
+        return { table[row1 * 16 + col2], table[row2 * 16 + col1] };
+}
+
+pair<unsigned char, unsigned char> decryptPair(const vector<unsigned char>& table, unsigned char a, unsigned char b) {
+    int row1, col1, row2, col2;
+    findPos(table, a, row1, col1);
+    findPos(table, b, row2, col2);
+
+    if (row1 == row2)
+        return { table[row1 * 16 + (col1 - 1 + 16) % 16], table[row2 * 16 + (col2 - 1 + 16) % 16] };
+    else if (col1 == col2)
+        return { table[((row1 - 1 + 16) % 16) * 16 + col1], table[((row2 - 1 + 16) % 16) * 16 + col2] };
+    else
+        return { table[row1 * 16 + col2], table[row2 * 16 + col1] };
+}
+
 vector<unsigned char> readFile(const string& filename) {
     ifstream file(filename, ios::binary);
     return vector<unsigned char>((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
