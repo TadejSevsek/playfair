@@ -103,6 +103,30 @@ pair<unsigned char, unsigned char> decryptPair(const vector<unsigned char>& tabl
         return { table[row1 * 16 + col2], table[row2 * 16 + col1] };
 }
 
+vector<unsigned char> fairplayDecrypt(const vector<unsigned char>& input, const vector<unsigned char>& table) {
+    vector<unsigned char> decrypted;
+
+    for (size_t i = 0; i < input.size(); i += 2) {
+        std::pair<unsigned char, unsigned char> dec = decryptPair(table, input[i], input[i + 1]);
+
+        // ce je drug duppe pol na output dej prvega dvakrat
+        if (dec.second == 0x00) {
+            decrypted.push_back(dec.first);
+            decrypted.push_back(dec.first); 
+        }
+        else {
+            decrypted.push_back(dec.first);
+            decrypted.push_back(dec.second);
+        }
+    }
+
+    // ce je EOF zadn znak ga damo stran
+    if (!decrypted.empty() && decrypted.back() == 0x03)
+        decrypted.pop_back();
+
+    return decrypted;
+}
+
 vector<unsigned char> readFile(const string& filename) {
     ifstream file(filename, ios::binary);
     return vector<unsigned char>((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
