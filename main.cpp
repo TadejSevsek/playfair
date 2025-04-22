@@ -15,6 +15,13 @@ vector<unsigned char> generateTable(const string& key) {
             used.insert((unsigned char)c);
         }
     }
+
+    //naredi isto se za ostale ascii znake
+    for (int i = 0; i < 256; i++) {
+        if (used.find((unsigned char)i) == used.end()) {
+            table.push_back((unsigned char)i);
+        }
+    }
     return table;
 }
 vector<unsigned char> readFile(const string& filename) {
