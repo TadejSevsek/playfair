@@ -137,3 +137,10 @@ void writeFile(const string& filename, const vector<unsigned char>& data) {
     file.write((const char*)data.data(), data.size());
 }
 
+int main(int argc, const char* const argv[]) {
+    if (argc != 4) {
+        return -1;
+    }
+    string key = argv[2];
+    return 0;
+}
