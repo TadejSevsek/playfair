@@ -49,6 +49,47 @@ pair<unsigned char, unsigned char> encryptPair(const vector<unsigned char>& tabl
         return { table[row1 * 16 + col2], table[row2 * 16 + col1] };
 }
 
+vector<unsigned char> preprocess(const vector<unsigned char>& input) {
+    vector<unsigned char> result;
+    for (size_t i = 0; i < input.size(); i++) {
+        unsigned char a = input[i];
+        unsigned char b;
+        if (i + 1 < input.size()) {
+            b = input[i + 1];
+            if (a == b) {
+                result.push_back(a);
+                result.push_back(0x00);
+                i++;  
+            }
+            else {
+                result.push_back(a);
+                result.push_back(b);
+                i++;
+            }
+        }
+        else {
+            result.push_back(a);
+            result.push_back(0x03);
+        }
+    }
+
+  
+
+    return result;
+}
+
+
+vector<unsigned char> fairplayEncrypt(const vector<unsigned char>& input, const vector<unsigned char>& table) {
+    vector<unsigned char> processed = preprocess(input);
+    vector<unsigned char> encrypted;
+    for (size_t i = 0; i < processed.size(); i += 2) {
+        std::pair<unsigned char, unsigned char> enc = encryptPair(table, processed[i], processed[i + 1]);
+        encrypted.push_back(enc.first);
+        encrypted.push_back(enc.second);
+    }
+    return encrypted;
+}
+
 pair<unsigned char, unsigned char> decryptPair(const vector<unsigned char>& table, unsigned char a, unsigned char b) {
     int row1, col1, row2, col2;
     findPos(table, a, row1, col1);
@@ -60,6 +101,30 @@ pair<unsigned char, unsigned char> decryptPair(const vector<unsigned char>& tabl
         return { table[((row1 - 1 + 16) % 16) * 16 + col1], table[((row2 - 1 + 16) % 16) * 16 + col2] };
     else
         return { table[row1 * 16 + col2], table[row2 * 16 + col1] };
+}
+
+vector<unsigned char> fairplayDecrypt(const vector<unsigned char>& input, const vector<unsigned char>& table) {
+    vector<unsigned char> decrypted;
+
+    for (size_t i = 0; i < input.size(); i += 2) {
+        std::pair<unsigned char, unsigned char> dec = decryptPair(table, input[i], input[i + 1]);
+
+        // ce je drug duppe pol na output dej prvega dvakrat
+        if (dec.second == 0x00) {
+            decrypted.push_back(dec.first);
+            decrypted.push_back(dec.first); 
+        }
+        else {
+            decrypted.push_back(dec.first);
+            decrypted.push_back(dec.second);
+        }
+    }
+
+    // ce je EOF zadn znak ga damo stran
+    if (!decrypted.empty() && decrypted.back() == 0x03)
+        decrypted.pop_back();
+
+    return decrypted;
 }
 
 vector<unsigned char> readFile(const string& filename) {
