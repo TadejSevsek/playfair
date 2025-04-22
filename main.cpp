@@ -9,5 +9,8 @@ vector<unsigned char> readFile(const string& filename) {
     return vector<unsigned char>((istreambuf_iterator<char>(file)), istreambuf_iterator<char>());
 }
 
-
+void writeFile(const string& filename, const vector<unsigned char>& data) {
+    ofstream file(filename, ios::binary);
+    file.write((const char*)data.data(), data.size());
+}
 
