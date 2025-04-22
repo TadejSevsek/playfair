@@ -1,6 +1,7 @@
 #include <vector>
 #include <fstream>
 #include <unordered_set>
+#include <iostream>
 using namespace std;
 
 
@@ -137,3 +138,22 @@ void writeFile(const string& filename, const vector<unsigned char>& data) {
     file.write((const char*)data.data(), data.size());
 }
 
+int main(int argc, const char* const argv[]) {
+    if (argc != 4) {
+        return -1;
+    }
+    string key = argv[2];
+    vector<unsigned char> input = readFile(argv[3]);
+    vector<unsigned char> table = generateTable(key);
+    if (argv[1][0] == 'e') {
+        vector<unsigned char> encrypted = fairplayEncrypt(input, table);
+        writeFile("out_e.txt", encrypted);
+        cout << "Encryption completed." << endl;
+    }
+    else {
+        vector<unsigned char> decrypted = fairplayDecrypt(input, table);
+        writeFile("out_d.txt", decrypted);
+        cout << "Decryption completed." << endl;
+    }
+    return 0;
+}
