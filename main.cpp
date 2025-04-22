@@ -143,5 +143,6 @@ int main(int argc, const char* const argv[]) {
     }
     string key = argv[2];
     vector<unsigned char> input = readFile(argv[3]);
+    vector<unsigned char> table = generateTable(key);
     return 0;
 }
